@@ -6,7 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import es.upm.miw.bantumi.R;
 import es.upm.miw.bantumi.ui.viewmodel.BantumiViewModel;
 
 public class JuegoBantumi {

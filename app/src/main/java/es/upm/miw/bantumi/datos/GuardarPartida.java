@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import es.upm.miw.bantumi.R;
-import es.upm.miw.bantumi.ui.actividades.MainActivity;
 
 public class GuardarPartida {
 
@@ -18,7 +17,7 @@ public class GuardarPartida {
     private static final String DIRECTORIO = "datos";
     private static final String NOMBRE_ARCHIVO = "partida.txt";
 
-    private Context context;
+    private final Context context;
 
     public GuardarPartida(Context context) {
         this.context = context;
