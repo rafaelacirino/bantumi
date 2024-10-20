@@ -2,6 +2,11 @@ package es.upm.miw.bantumi.dominio.logica;
 
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import es.upm.miw.bantumi.R;
 import es.upm.miw.bantumi.ui.viewmodel.BantumiViewModel;
 
 public class JuegoBantumi {
@@ -204,8 +209,18 @@ public class JuegoBantumi {
      * @return juego serializado
      */
     public String serializa() {
-        // @TODO
-        return null;
+        JSONObject jsonObject = new JSONObject();
+        try {
+            JSONArray jsonTablero = new JSONArray();
+            for (int i = 0; i < NUM_POSICIONES; i++) {
+                jsonTablero.put(getSemillas(i));
+            }
+            jsonObject.put("tablero", jsonTablero);
+            jsonObject.put("turno", turnoActual().name());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject.toString();
     }
 
     /**
@@ -214,6 +229,17 @@ public class JuegoBantumi {
      * @param juegoSerializado cadena que representa el estado completo del juego
      */
     public void deserializa(String juegoSerializado) {
-        // @TODO
+        try {
+            JSONObject jsonObject = new JSONObject(juegoSerializado);
+            JSONArray jsonTablero = jsonObject.getJSONArray("tablero");
+            for (int i = 0; i < NUM_POSICIONES; i++) {
+                setSemillas(i, jsonTablero.getInt(i));
+            }
+            String turnoString = jsonObject.getString("turno");
+            Turno turno = Turno.valueOf(turnoString);
+            setTurno(turno);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

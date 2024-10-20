@@ -20,6 +20,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Locale;
 
+import es.upm.miw.bantumi.datos.GuardarPartida;
 import es.upm.miw.bantumi.ui.fragmentos.FinalAlertDialog;
 import es.upm.miw.bantumi.R;
 import es.upm.miw.bantumi.dominio.logica.JuegoBantumi;
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     protected final String LOG_TAG = "MiW";
     public JuegoBantumi juegoBantumi;
     private BantumiViewModel bantumiVM;
+    private GuardarPartida guardarPartida;
     int numInicialSemillas;
 
     @Override
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         numInicialSemillas = getResources().getInteger(R.integer.intNumInicialSemillas);
         bantumiVM = new ViewModelProvider(this).get(BantumiViewModel.class);
         juegoBantumi = new JuegoBantumi(bantumiVM, JuegoBantumi.Turno.turnoJ1, numInicialSemillas);
+        guardarPartida = new GuardarPartida(this);
         crearObservadores();
     }
 
@@ -153,6 +156,12 @@ public class MainActivity extends AppCompatActivity {
                         .setNegativeButton(android.R.string.cancel, null)
                         .show();
                 return true;
+            case R.id.opcGuardarPartida:
+                salvarPartida();
+                return true;
+            case R.id.opcRecuperarPartida:
+                mostrarAlertDialogRecuperarPartida();
+                return true;
 
             // @TODO!!! resto opciones
 
@@ -164,6 +173,68 @@ public class MainActivity extends AppCompatActivity {
                 ).show();
         }
         return true;
+    }
+
+    private void salvarPartida() {
+        String estadoPartida = generarEstadoPartida();
+        guardarPartida.guardarPartida(estadoPartida);
+        Snackbar.make(
+                findViewById(android.R.id.content),
+                getString(R.string.partidaGuardada),
+                Snackbar.LENGTH_SHORT
+        ).show();
+    }
+
+    private void mostrarAlertDialogRecuperarPartida() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.confirmarRecuperar)
+                .setMessage(R.string.confirmarRecuperarMensage)
+                .setPositiveButton(android.R.string.ok, (dialog, wich) -> {
+                    recuperarPartida();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void recuperarPartida() {
+            String estadoCargado = guardarPartida.cargarPartido();
+            if (estadoCargado != null) {
+                actualizarEstadoPartida(estadoCargado);
+                Snackbar.make(
+                        findViewById(android.R.id.content),
+                        getString(R.string.paartidaRecuperada),
+                        Snackbar.LENGTH_SHORT
+                ).show();
+            } else {
+                Snackbar.make(
+                        findViewById(android.R.id.content),
+                        getString(R.string.erroCargarPartida),
+                        Snackbar.LENGTH_LONG
+                ).show();
+            }
+    }
+
+    private String generarEstadoPartida() {
+        StringBuilder estado = new StringBuilder();
+        for (int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
+            estado.append(juegoBantumi.getSemillas(i)).append(",");
+        }
+        estado.append(juegoBantumi.turnoActual());
+        return estado.toString();
+    }
+
+    private void actualizarEstadoPartida(String estado) {
+        String[] partes = estado.split(",");
+        for(int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
+            int numSemillas = Integer.parseInt(partes[i]);
+            juegoBantumi.setSemillas(i, numSemillas);
+        }
+        JuegoBantumi.Turno turnoActual = JuegoBantumi.Turno.valueOf(partes[JuegoBantumi.NUM_POSICIONES]);
+        juegoBantumi.setTurno(turnoActual);
+        for(int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
+            mostrarValor(i, juegoBantumi.getSemillas(i));
+        }
+        marcarTurno(turnoActual);
     }
 
     /**

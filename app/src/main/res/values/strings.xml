@@ -53,4 +53,18 @@
     <string name="txtDialogoFinalTitulo">Fin del juego</string>
     <string name="txtDialogoFinalPregunta">¿Desea jugar otra partida?</string>
 
+    <string name ="guardaPartida">Guarda Partida</string>
+    <string name ="diretorio">datos</string>
+    <string name ="nomeArquivo">partida.txt</string>
+
+    <string name="partidaGuardada">Partida guardada</string>
+    <string name="erroGuardar">Error al guardar el juego</string>
+    <string name="archivoNoLocalizado">Archivo no localizado</string>
+    <string name="juegoCargadoExito">El juego se cargó exitosamente.</string>
+    <string name="juegoCargadoError">Error al cargar el juego.</string>
+    <string name="paartidaRecuperada">Partida recuperada</string>
+    <string name="erroCargarPartida">Error al cargar partida!</string>
+    <string name="confirmarRecuperarMensage">¿Estás seguro de que quieres recuperar el partido? El partido actual será reemplazado.</string>
+    <string name="confirmarRecuperar">Confirmar la Recuperación</string>
+
 </resources>
