@@ -18,6 +18,12 @@
     <string name="txtOpcionRecuperar">Recuperar Partida</string>
     <string name="txtOpcionMejoresResultados">Mejores Resultados</string>
 
+    <!-- Reiniciar -->
+    <string name="reiniciarText">Reiniciar Juego</string>
+    <string name="reiniciarMessage">Este juego será reiniciado!</string>
+    <string name="reiniciadoMessage">Juego reiniciado</string>
+
+
     <!-- Acerca de -->
     <string name="aboutText">Acerca de</string>
     <string name="aboutTitle">¿Cómo se juega?</string>

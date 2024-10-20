@@ -138,6 +138,21 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton(android.R.string.ok, null)
                         .show();
                 return true;
+            case R.id.opcReiniciarPartida:
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.reiniciarText)
+                        .setMessage(R.string.reiniciarMessage)
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            juegoBantumi.inicializar(JuegoBantumi.Turno.turnoJ1);
+                            Snackbar.make(
+                                    findViewById(android.R.id.content),
+                                    getString(R.string.reiniciadoMessage),
+                                    Snackbar.LENGTH_SHORT
+                            ).show();
+                        })
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show();
+                return true;
 
             // @TODO!!! resto opciones
 
