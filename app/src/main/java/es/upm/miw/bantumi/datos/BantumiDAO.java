@@ -23,4 +23,10 @@ public interface BantumiDAO {
 
     @Delete
     void deletePartida(Bantumi bantumi);
+
+    @Query("SELECT * FROM " + Bantumi.TABLA +
+            " ORDER BY CASE WHEN semillasJugador1 > semillasJugador2 " +
+            "THEN semillasJugador1 " +
+            "ELSE semillasJugador2 END DESC LIMIT 10")
+    LiveData<List<Bantumi>> getTop10Resultados();
 }

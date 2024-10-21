@@ -168,7 +168,25 @@ public class MainActivity extends AppCompatActivity {
             case R.id.opcRecuperarPartida:
                 mostrarAlertDialogRecuperarPartida();
                 return true;
-            // @TODO!!! resto opciones
+            case R.id.opcMejoresResultados:
+                startActivity(new Intent(this, MejoresResultadosActivity.class));
+                return true;
+            case R.id.btnBorrarResultados:
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.confirmarBorrar)
+                        .setMessage(R.string.confirmarBorrarMensaje)
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                            bantumiVM.borrarTodosResultados();
+                            Snackbar.make(findViewById(android.R.id.content),
+                                    getString(R.string.resultadosBorrados),
+                                    Snackbar.LENGTH_SHORT)
+                                    .show();
+                        })
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show();
+                return true;
+                // @TODO!!! resto opciones
+
 
             default:
                 Snackbar.make(

@@ -49,6 +49,12 @@
     <string name="prefTituloCategoria2">Ajustes del juego</string>
     <string name="prefTituloCategoria3">Más información…</string>
 
+    <!-- Resultados -->
+    <string name="confirmarBorrar">¿Confirma que dea borrar?</string>
+    <string name="confirmarBorrarMensaje">Los resultados fueron borrados</string>
+    <string name="resultadosBorrados">Resultados borrados</string>
+
+
     <!-- Diálogo Final -->
     <string name="txtDialogoFinalTitulo">Fin del juego</string>
     <string name="txtDialogoFinalPregunta">¿Desea jugar otra bantumi?</string>
@@ -66,5 +72,7 @@
     <string name="erroCargarPartida">Error al cargar bantumi!</string>
     <string name="confirmarRecuperarMensage">¿Estás seguro de que quieres recuperar el partido? El partido actual será reemplazado.</string>
     <string name="confirmarRecuperar">Confirmar la Recuperación</string>
+    <string name="borrar_resultados">Borrar todos los resultados</string>
+    <string name="mejores_resultados">Mejores Resultados</string>
 
 </resources>
