@@ -1,7 +1,10 @@
 package es.upm.miw.bantumi.ui.actividades;
 
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,8 +21,11 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.Date;
 import java.util.Locale;
 
+import es.upm.miw.bantumi.datos.Bantumi;
+import es.upm.miw.bantumi.datos.BantumiRoomDatabase;
 import es.upm.miw.bantumi.datos.GuardarPartida;
 import es.upm.miw.bantumi.ui.fragmentos.FinalAlertDialog;
 import es.upm.miw.bantumi.R;
@@ -162,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.opcRecuperarPartida:
                 mostrarAlertDialogRecuperarPartida();
                 return true;
-
             // @TODO!!! resto opciones
 
             default:
@@ -267,16 +272,38 @@ public class MainActivity extends AppCompatActivity {
      * El juego ha terminado. Volver a jugar?
      */
     private void finJuego() {
-        String texto = (juegoBantumi.getSemillas(6) > 6 * numInicialSemillas)
-                ? "Gana Jugador 1"
-                : "Gana Jugador 2";
-        if (juegoBantumi.getSemillas(6) == 6 * numInicialSemillas) {
+        String texto;
+        int semillasJugador1 = juegoBantumi.getSemillas(6);
+        int semillasJugador2 = juegoBantumi.getSemillas(13);
+
+        if(semillasJugador1 > 6 * numInicialSemillas) {
+            texto = "Gana Jugador 1";
+        }
+        else if(semillasJugador2 > 6 * numInicialSemillas) {
+            texto = "Gana Jugador 2";
+        }
+        else {
             texto = "¡¡¡ EMPATE !!!";
         }
-
-        // @TODO guardar puntuación
-
-        // terminar
+        guardarPuntuacion(semillasJugador1, semillasJugador2);
         new FinalAlertDialog(texto).show(getSupportFragmentManager(), "ALERT_DIALOG");
+    }
+
+    private void guardarPuntuacion(int semillasJugador1, int semillasJugador2) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String nombreJugador = sharedPreferences.getString("nombreJugador", "Jugador 1");
+
+        Bantumi partida = new Bantumi(nombreJugador, new Date(), semillasJugador1, semillasJugador2);
+
+        BantumiRoomDatabase.databaseWriteExecutor.execute(() -> {
+            BantumiRoomDatabase db = BantumiRoomDatabase.getDatabase(this);
+            db.partidaDao().insert(partida);
+
+            runOnUiThread(() -> {
+                Snackbar.make(findViewById(android.R.id.content),
+                        getString(R.string.partidaGuardada),
+                        Snackbar.LENGTH_SHORT).show();
+            });
+        });
     }
 }
