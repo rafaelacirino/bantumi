@@ -14,9 +14,9 @@ import es.upm.miw.bantumi.dominio.logica.JuegoBantumi;
 
 public class BantumiViewModel extends ViewModel {
 
-    private ArrayList<MutableLiveData<Integer>> tablero;
+    private final ArrayList<MutableLiveData<Integer>> tablero;
 
-    private MutableLiveData<JuegoBantumi.Turno> turno;
+    private final MutableLiveData<JuegoBantumi.Turno> turno;
 
     private LiveData<List<Bantumi>> top10Resultados;
 
