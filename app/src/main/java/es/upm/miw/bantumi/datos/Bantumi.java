@@ -23,4 +23,14 @@ public class Bantumi {
         this.semillasJugador1 = semillasJugador1;
         this.semillasJugador2 = semillasJugador2;
     }
+
+    @Override
+    public String toString() {
+        return "Bantumi{" +
+                " nombreJugador='" + nombreJugador + '\'' +
+                ", fechaPartida=" + fechaPartida +
+                ", semillasJugador1=" + semillasJugador1 +
+                ", semillasJugador2=" + semillasJugador2 +
+                '}';
+    }
 }

@@ -2,6 +2,7 @@ package es.upm.miw.bantumi.ui.actividades;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -48,6 +49,9 @@ public class MejoresResultadosActivity extends AppCompatActivity {
                             MejoresResultadosActivity.this,
                             android.R.layout.simple_list_item_1, bantumiList);
                     listaResultados.setAdapter(adapter);
+                } else {
+                    Log.d("MejoresResultados", "A lista de melhores resultados está vazia");
+                    Toast.makeText(MejoresResultadosActivity.this, "Nenhum resultado encontrado.", Toast.LENGTH_SHORT).show();
                 }
             }
         });

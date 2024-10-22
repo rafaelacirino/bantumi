@@ -148,19 +148,8 @@ public class MainActivity extends AppCompatActivity {
                         .show();
                 return true;
             case R.id.opcReiniciarPartida:
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.reiniciarText)
-                        .setMessage(R.string.reiniciarMessage)
-                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                            juegoBantumi.inicializar(JuegoBantumi.Turno.turnoJ1);
-                            Snackbar.make(
-                                    findViewById(android.R.id.content),
-                                    getString(R.string.reiniciadoMessage),
-                                    Snackbar.LENGTH_SHORT
-                            ).show();
-                        })
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .show();
+                new FinalAlertDialog(getString(R.string.reiniciarMessage))
+                        .show(getSupportFragmentManager(), "REINICIAR_DIALOG");
                 return true;
             case R.id.opcGuardarPartida:
                 salvarPartida();
@@ -172,21 +161,9 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, MejoresResultadosActivity.class));
                 return true;
             case R.id.btnBorrarResultados:
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.confirmarBorrar)
-                        .setMessage(R.string.confirmarBorrarMensaje)
-                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                            bantumiVM.borrarTodosResultados();
-                            Snackbar.make(findViewById(android.R.id.content),
-                                    getString(R.string.resultadosBorrados),
-                                    Snackbar.LENGTH_SHORT)
-                                    .show();
-                        })
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .show();
+                new FinalAlertDialog(getString(R.string.confirmarBorrar))
+                        .show(getSupportFragmentManager(), "CONFIRMAR_BORRAR");
                 return true;
-                // @TODO!!! resto opciones
-
 
             default:
                 Snackbar.make(

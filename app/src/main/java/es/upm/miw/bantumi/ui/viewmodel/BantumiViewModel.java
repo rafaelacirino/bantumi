@@ -1,6 +1,9 @@
 package es.upm.miw.bantumi.ui.viewmodel;
 
+import android.app.Application;
+
 import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -12,7 +15,7 @@ import es.upm.miw.bantumi.datos.Bantumi;
 import es.upm.miw.bantumi.datos.BantumiRepositorio;
 import es.upm.miw.bantumi.dominio.logica.JuegoBantumi;
 
-public class BantumiViewModel extends ViewModel {
+public class BantumiViewModel extends AndroidViewModel {
 
     private final ArrayList<MutableLiveData<Integer>> tablero;
 
@@ -22,12 +25,14 @@ public class BantumiViewModel extends ViewModel {
 
     private BantumiRepositorio bantumiRepositorio;
 
-    public BantumiViewModel() {
+    public BantumiViewModel(Application application) {
+        super(application);
         turno = new MutableLiveData<>(JuegoBantumi.Turno.turnoJ1);
         tablero = new ArrayList<>(JuegoBantumi.NUM_POSICIONES);
         for (int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
             tablero.add(i, new MutableLiveData<>(0));
         }
+        bantumiRepositorio = new BantumiRepositorio(application);
     }
 
     /**
@@ -75,7 +80,7 @@ public class BantumiViewModel extends ViewModel {
 
     public LiveData<List<Bantumi>> getTop10Resultados() {
         if(top10Resultados == null) {
-            top10Resultados = new MutableLiveData<>();
+            top10Resultados = bantumiRepositorio.getTop10Resultados();
         }
         return top10Resultados;
     }
