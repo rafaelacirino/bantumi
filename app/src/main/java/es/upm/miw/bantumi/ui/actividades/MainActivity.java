@@ -3,12 +3,14 @@ package es.upm.miw.bantumi.ui.actividades;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -178,6 +180,9 @@ public class MainActivity extends AppCompatActivity {
                 new FinalAlertDialog(getString(R.string.confirmarBorrar))
                         .show(getSupportFragmentManager(), "CONFIRMAR_BORRAR");
                 return true;
+            case R.id.opcCambiarColor:
+                mostrarDialogoCambiarColor();
+                return true;
 
             default:
                 Snackbar.make(
@@ -187,6 +192,29 @@ public class MainActivity extends AppCompatActivity {
                 ).show();
         }
         return true;
+    }
+
+    private void mostrarDialogoCambiarColor() {
+        String[] color = {"Rojo", "Azul", "Verde", "Amarillo"};
+        int[] coloresValores = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW};
+
+        new AlertDialog.Builder(this)
+                .setTitle("Selecciona un color")
+                .setItems(color, (dialog, which) -> {
+                    cambiarColor(coloresValores[which]);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void cambiarColor(int color) {
+        RelativeLayout relativeLayout = findViewById(R.id.main);
+        relativeLayout.setBackgroundColor(color);
+
+        TextView tvJugador1 = findViewById(R.id.tvPlayer1);
+        TextView tvJugador2 = findViewById(R.id.tvPlayer2);
+        tvJugador1.setTextColor(color);
+        tvJugador2.setTextColor(color);
     }
 
     private void salvarPartida() {

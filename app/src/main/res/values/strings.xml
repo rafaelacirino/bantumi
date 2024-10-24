@@ -76,5 +76,6 @@
     <string name="mejores_resultados">Mejores Resultados</string>
     <string name="empezar_partido">Empezar el Partido</string>
     <string name="elejir_quien_empieza">Elige jugador para comenzar</string>
+    <string name="txtOpcionCambiarColor">Cambiar Color</string>
 
 </resources>
