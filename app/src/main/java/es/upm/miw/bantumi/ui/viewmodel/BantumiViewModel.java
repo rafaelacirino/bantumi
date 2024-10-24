@@ -1,26 +1,37 @@
 package es.upm.miw.bantumi.ui.viewmodel;
 
+import android.app.Application;
+
 import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import es.upm.miw.bantumi.datos.Bantumi;
+import es.upm.miw.bantumi.datos.BantumiRepositorio;
 import es.upm.miw.bantumi.dominio.logica.JuegoBantumi;
 
-public class BantumiViewModel extends ViewModel {
+public class BantumiViewModel extends AndroidViewModel {
 
-    private ArrayList<MutableLiveData<Integer>> tablero;
+    private final ArrayList<MutableLiveData<Integer>> tablero;
 
-    private MutableLiveData<JuegoBantumi.Turno> turno;
+    private final MutableLiveData<JuegoBantumi.Turno> turno;
 
-    public BantumiViewModel() {
+    private LiveData<List<Bantumi>> top10Resultados;
+
+    private BantumiRepositorio bantumiRepositorio;
+
+    public BantumiViewModel(Application application) {
+        super(application);
         turno = new MutableLiveData<>(JuegoBantumi.Turno.turnoJ1);
         tablero = new ArrayList<>(JuegoBantumi.NUM_POSICIONES);
         for (int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
             tablero.add(i, new MutableLiveData<>(0));
         }
+        bantumiRepositorio = new BantumiRepositorio(application);
     }
 
     /**
@@ -64,5 +75,16 @@ public class BantumiViewModel extends ViewModel {
             throw new ArrayIndexOutOfBoundsException();
         }
         tablero.get(pos).setValue(v);
+    }
+
+    public LiveData<List<Bantumi>> getTop10Resultados() {
+        if(top10Resultados == null) {
+            top10Resultados = bantumiRepositorio.getTop10Resultados();
+        }
+        return top10Resultados;
+    }
+
+    public void borrarTodosResultados() {
+        bantumiRepositorio.deleteAll();
     }
 }

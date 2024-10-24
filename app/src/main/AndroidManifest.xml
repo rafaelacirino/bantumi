@@ -13,7 +13,7 @@
         android:theme="@style/Theme.Bantumi"
         tools:targetApi="s">
         <activity
-            android:name=".ui.actividades.MainActivity"
+            android:name=".ui.actividades.ElejirJugadorActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,6 +21,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.actividades.MejoresResultadosActivity"/>
+        <activity android:name=".ui.actividades.MainActivity"/>
     </application>
 
 </manifest>

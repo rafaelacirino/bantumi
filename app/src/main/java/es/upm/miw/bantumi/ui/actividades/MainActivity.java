@@ -1,11 +1,16 @@
 package es.upm.miw.bantumi.ui.actividades;
 
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,8 +23,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.Date;
 import java.util.Locale;
 
+import es.upm.miw.bantumi.datos.Bantumi;
+import es.upm.miw.bantumi.datos.BantumiRoomDatabase;
+import es.upm.miw.bantumi.datos.GuardarPartida;
 import es.upm.miw.bantumi.ui.fragmentos.FinalAlertDialog;
 import es.upm.miw.bantumi.R;
 import es.upm.miw.bantumi.dominio.logica.JuegoBantumi;
@@ -30,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     protected final String LOG_TAG = "MiW";
     public JuegoBantumi juegoBantumi;
     private BantumiViewModel bantumiVM;
+    private GuardarPartida guardarPartida;
     int numInicialSemillas;
 
     @Override
@@ -46,7 +56,22 @@ public class MainActivity extends AppCompatActivity {
         // Instancia el ViewModel y el juego, y asigna observadores a los huecos
         numInicialSemillas = getResources().getInteger(R.integer.intNumInicialSemillas);
         bantumiVM = new ViewModelProvider(this).get(BantumiViewModel.class);
-        juegoBantumi = new JuegoBantumi(bantumiVM, JuegoBantumi.Turno.turnoJ1, numInicialSemillas);
+
+        Intent intent = getIntent();
+        JuegoBantumi.Turno turnoInicial;
+        if(intent != null && intent.hasExtra("primero_jugador")) {
+            String primeroJugador = intent.getStringExtra("primero_jugador");
+            if(String.valueOf(R.string.txtPlayer1) == primeroJugador) {
+                turnoInicial = JuegoBantumi.Turno.turnoJ1;
+            } else {
+                turnoInicial = JuegoBantumi.Turno.turnoJ2;
+            }
+        } else{
+            turnoInicial = JuegoBantumi.Turno.turnoJ1;
+        }
+
+        juegoBantumi = new JuegoBantumi(bantumiVM, turnoInicial, numInicialSemillas);
+        guardarPartida = new GuardarPartida(this);
         crearObservadores();
     }
 
@@ -138,8 +163,26 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton(android.R.string.ok, null)
                         .show();
                 return true;
-
-            // @TODO!!! resto opciones
+            case R.id.opcReiniciarPartida:
+                new FinalAlertDialog(getString(R.string.reiniciarMessage))
+                        .show(getSupportFragmentManager(), "REINICIAR_DIALOG");
+                return true;
+            case R.id.opcGuardarPartida:
+                salvarPartida();
+                return true;
+            case R.id.opcRecuperarPartida:
+                mostrarAlertDialogRecuperarPartida();
+                return true;
+            case R.id.opcMejoresResultados:
+                startActivity(new Intent(this, MejoresResultadosActivity.class));
+                return true;
+            case R.id.btnBorrarResultados:
+                new FinalAlertDialog(getString(R.string.confirmarBorrar))
+                        .show(getSupportFragmentManager(), "CONFIRMAR_BORRAR");
+                return true;
+            case R.id.opcCambiarColor:
+                mostrarDialogoCambiarColor();
+                return true;
 
             default:
                 Snackbar.make(
@@ -149,6 +192,91 @@ public class MainActivity extends AppCompatActivity {
                 ).show();
         }
         return true;
+    }
+
+    private void mostrarDialogoCambiarColor() {
+        String[] color = {"Rojo", "Azul", "Verde", "Amarillo"};
+        int[] coloresValores = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW};
+
+        new AlertDialog.Builder(this)
+                .setTitle("Selecciona un color")
+                .setItems(color, (dialog, which) -> {
+                    cambiarColor(coloresValores[which]);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void cambiarColor(int color) {
+        RelativeLayout relativeLayout = findViewById(R.id.main);
+        relativeLayout.setBackgroundColor(color);
+
+        TextView tvJugador1 = findViewById(R.id.tvPlayer1);
+        TextView tvJugador2 = findViewById(R.id.tvPlayer2);
+        tvJugador1.setTextColor(color);
+        tvJugador2.setTextColor(color);
+    }
+
+    private void salvarPartida() {
+        String estadoPartida = generarEstadoPartida();
+        guardarPartida.guardarPartida(estadoPartida);
+        Snackbar.make(
+                findViewById(android.R.id.content),
+                getString(R.string.partidaGuardada),
+                Snackbar.LENGTH_SHORT
+        ).show();
+    }
+
+    private void mostrarAlertDialogRecuperarPartida() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.confirmarRecuperar)
+                .setMessage(R.string.confirmarRecuperarMensage)
+                .setPositiveButton(android.R.string.ok, (dialog, wich) -> {
+                    recuperarPartida();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void recuperarPartida() {
+            String estadoCargado = guardarPartida.cargarPartido();
+            if (estadoCargado != null) {
+                actualizarEstadoPartida(estadoCargado);
+                Snackbar.make(
+                        findViewById(android.R.id.content),
+                        getString(R.string.paartidaRecuperada),
+                        Snackbar.LENGTH_SHORT
+                ).show();
+            } else {
+                Snackbar.make(
+                        findViewById(android.R.id.content),
+                        getString(R.string.erroCargarPartida),
+                        Snackbar.LENGTH_LONG
+                ).show();
+            }
+    }
+
+    private String generarEstadoPartida() {
+        StringBuilder estado = new StringBuilder();
+        for (int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
+            estado.append(juegoBantumi.getSemillas(i)).append(",");
+        }
+        estado.append(juegoBantumi.turnoActual());
+        return estado.toString();
+    }
+
+    private void actualizarEstadoPartida(String estado) {
+        String[] partes = estado.split(",");
+        for(int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
+            int numSemillas = Integer.parseInt(partes[i]);
+            juegoBantumi.setSemillas(i, numSemillas);
+        }
+        JuegoBantumi.Turno turnoActual = JuegoBantumi.Turno.valueOf(partes[JuegoBantumi.NUM_POSICIONES]);
+        juegoBantumi.setTurno(turnoActual);
+        for(int i = 0; i < JuegoBantumi.NUM_POSICIONES; i++) {
+            mostrarValor(i, juegoBantumi.getSemillas(i));
+        }
+        marcarTurno(turnoActual);
     }
 
     /**
@@ -181,16 +309,38 @@ public class MainActivity extends AppCompatActivity {
      * El juego ha terminado. Volver a jugar?
      */
     private void finJuego() {
-        String texto = (juegoBantumi.getSemillas(6) > 6 * numInicialSemillas)
-                ? "Gana Jugador 1"
-                : "Gana Jugador 2";
-        if (juegoBantumi.getSemillas(6) == 6 * numInicialSemillas) {
+        String texto;
+        int semillasJugador1 = juegoBantumi.getSemillas(6);
+        int semillasJugador2 = juegoBantumi.getSemillas(13);
+
+        if(semillasJugador1 > 6 * numInicialSemillas) {
+            texto = "Gana Jugador 1";
+        }
+        else if(semillasJugador2 > 6 * numInicialSemillas) {
+            texto = "Gana Jugador 2";
+        }
+        else {
             texto = "¡¡¡ EMPATE !!!";
         }
-
-        // @TODO guardar puntuación
-
-        // terminar
+        guardarPuntuacion(semillasJugador1, semillasJugador2);
         new FinalAlertDialog(texto).show(getSupportFragmentManager(), "ALERT_DIALOG");
+    }
+
+    private void guardarPuntuacion(int semillasJugador1, int semillasJugador2) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String nombreJugador = sharedPreferences.getString("nombreJugador", "Jugador 1");
+
+        Bantumi partida = new Bantumi(nombreJugador, new Date(), semillasJugador1, semillasJugador2);
+
+        BantumiRoomDatabase.databaseWriteExecutor.execute(() -> {
+            BantumiRoomDatabase db = BantumiRoomDatabase.getDatabase(this);
+            db.partidaDao().insert(partida);
+
+            runOnUiThread(() -> {
+                Snackbar.make(findViewById(android.R.id.content),
+                        getString(R.string.partidaGuardada),
+                        Snackbar.LENGTH_SHORT).show();
+            });
+        });
     }
 }
