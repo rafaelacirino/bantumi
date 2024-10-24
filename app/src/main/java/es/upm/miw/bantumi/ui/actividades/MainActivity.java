@@ -54,7 +54,21 @@ public class MainActivity extends AppCompatActivity {
         // Instancia el ViewModel y el juego, y asigna observadores a los huecos
         numInicialSemillas = getResources().getInteger(R.integer.intNumInicialSemillas);
         bantumiVM = new ViewModelProvider(this).get(BantumiViewModel.class);
-        juegoBantumi = new JuegoBantumi(bantumiVM, JuegoBantumi.Turno.turnoJ1, numInicialSemillas);
+
+        Intent intent = getIntent();
+        JuegoBantumi.Turno turnoInicial;
+        if(intent != null && intent.hasExtra("primero_jugador")) {
+            String primeroJugador = intent.getStringExtra("primero_jugador");
+            if(String.valueOf(R.string.txtPlayer1) == primeroJugador) {
+                turnoInicial = JuegoBantumi.Turno.turnoJ1;
+            } else {
+                turnoInicial = JuegoBantumi.Turno.turnoJ2;
+            }
+        } else{
+            turnoInicial = JuegoBantumi.Turno.turnoJ1;
+        }
+
+        juegoBantumi = new JuegoBantumi(bantumiVM, turnoInicial, numInicialSemillas);
         guardarPartida = new GuardarPartida(this);
         crearObservadores();
     }
